@@ -1,0 +1,60 @@
+
+#jangan lupa install pip pypdf2 dan re
+import PyPDF2
+import re
+
+pdfFile= open(r'E:\SEMESTER 6\Pemrosesan Bahasa Alami\Pertemuan Ke-3\data\uud1945.pdf', 'rb') #membuka UUD
+pdfRead= PyPDF2.PdfFileReader(pdfFile) #membaca UUD
+allText=""
+for pageNum in range(pdfRead.getNumPages()):
+    page= pdfRead.getPage(pageNum)
+    content= page.extractText()
+    allText+=content
+
+#print(allText)
+#setelah print allText sudah benar, alangkah baiknya dimatikan agar keluar output yang lain
+
+#menggunakan modul sastrawi, install terlebih dahulu
+#menghilangkan stopword
+from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
+from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory
+
+factory=StopWordRemoverFactory()
+Sastrawi_stopwords_id= factory.get_stop_words()
+stemmer=StemmerFactory().create_stemmer()
+
+token= allText.split(' ')
+t_id= [t for t in token if t not in Sastrawi_stopwords_id]
+
+allTextfinal=stemmer.stem(str(' '.join(t_id)))
+
+
+#buat dahulu file .txt tanpa isi. save pada folder
+
+fileoutput_satu=open(r'E:\SEMESTER 6\Pemrosesan Bahasa Alami\Pertemuan Ke-3\\satu.txt', 'w',encoding="utf-8")
+fileoutput_satu.write(allTextfinal)
+fileoutput_satu.close()
+
+#menghitung frekuensi setiap token
+#banyaknya kata "x" dalam pdf uud 
+fileoutput_dua=open(r'E:\SEMESTER 6\Pemrosesan Bahasa Alami\Pertemuan Ke-3\\satu.txt',encoding="utf-8") 
+string_hasil=fileoutput_dua.read().lower()
+pengecekkan = re.findall(r'\b[a-z]{3,15}\b', string_hasil)
+frek={}
+for kata in pengecekkan:
+    iterasi= frek.get(kata, 0)
+    frek[kata]=iterasi+1
+
+daftar_frek=frek.keys()
+
+#buat dahulu file .txt tanpa isi lagi, dengan nama berbeda jadi isinya nanti hasil frekuensinya
+fileoutput_tiga = open(r'E:\SEMESTER 6\Pemrosesan Bahasa Alami\Pertemuan Ke-3\dua.txt', 'w', encoding="utf-8")
+
+for katafinal in daftar_frek:
+    kata_frek=katafinal, frek[katafinal]
+    fileoutput_tiga.write(str(kata_frek))
+    print(kata_frek)
+
+fileoutput_tiga.close()
+
+
